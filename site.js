@@ -46,7 +46,7 @@ function render() {
   }
   $('intro').style.opacity = 1 - seg(p, 0.01, 0.06);
   const cap = (CAPS.filter(([at]) => f >= at).pop() || CAPS[0])[1];
-  if (cap !== lastCap) { lastCap = cap; if (cap) $('caption').textContent = cap; }
+  if (cap !== lastCap) lastCap = cap;
   $('caption').style.opacity = cap ? 1 : 0; $('caption').style.pointerEvents = cap ? 'auto' : 'none';
   const fin = seg(p, 0.86, 0.96, easeOut);
   const fl = $('final'); fl.style.opacity = fin; fl.style.transform = `translateY(${lerp(30, 0, fin)}px)`; fl.style.pointerEvents = fin > .5 ? 'auto' : 'none';
@@ -90,6 +90,9 @@ addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
 document.querySelectorAll('[data-stagger] > li').forEach((li, i) => { li.classList.add('reveal'); li.style.setProperty('--i', i); });
 document.querySelectorAll('[data-stagger-lines] > div').forEach((d, i) => d.style.setProperty('--i', i));
 const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
-document.querySelectorAll('.reveal, .wipe, .mask-host, .points, .slide-in, .contact').forEach(el => io.observe(el));
+document.querySelectorAll('.reveal, .mask-host, .points, .slide-in, .contact').forEach(el => io.observe(el));
+// A clipped element can count as invisible, so watch the wipe's parent and reveal the wipe from there
+const wio = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.querySelectorAll(':scope > .wipe').forEach(w => w.classList.add('in')); wio.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
+document.querySelectorAll('.wipe').forEach(w => wio.observe(w.parentElement));
 const head = document.querySelector('.site-head');
 addEventListener('scroll', () => head.classList.toggle('is-solid', scrollY > innerHeight * 0.5), { passive: true });
