@@ -30,7 +30,7 @@ const WALL = { x0: 151 / 1920, x1: 1691 / 1920, y0: 148 / 1080, y1: 906 / 1080 }
 const CAPS = [[0, 'Scroll to build the wall'], [8, 'Floor and ceiling channel'], [30, 'Aluminium posts'], [46, 'Glass panes'], [72, 'Solid wall panel'], [82, 'Frosted band at eye height'], [94, 'Oak veneer door in an aluminium frame'], [113, '']];
 const hero = $('hero');
 let lastCap = null;
-function progress() { const r = hero.getBoundingClientRect(); return clamp(-r.top / (r.height - innerHeight)); }
+function progress() { const r = hero.getBoundingClientRect(), span = r.height - innerHeight; const p = span > 0 ? clamp(-r.top / span) : 0; return Number.isFinite(p) ? p : 0; }
 function render() {
   const p = progress();
   const f = seg(p, 0, 0.84) * (COUNT - 1);
@@ -44,17 +44,18 @@ function render() {
     canvas.style.transform = `translate(${lerp(0, tx, e)}px, ${lerp(0, ty, e)}px) scale(${lerp(1, z, e)})`;
   }
   $('intro').style.opacity = 1 - seg(p, 0.01, 0.06);
-  const cap = CAPS.filter(([at]) => f >= at).pop()[1];
+  const cap = (CAPS.filter(([at]) => f >= at).pop() || CAPS[0])[1];
   if (cap !== lastCap) { lastCap = cap; if (cap) $('caption').textContent = cap; }
   $('caption').style.opacity = cap ? 1 : 0; $('caption').style.pointerEvents = cap ? 'auto' : 'none';
   const fin = seg(p, 0.86, 0.96, easeOut);
   const fl = $('final'); fl.style.opacity = fin; fl.style.transform = `translateY(${lerp(30, 0, fin)}px)`; fl.style.pointerEvents = fin > .5 ? 'auto' : 'none';
   fl.inert = fin < .5;
+  $('herobar').style.transform = `scaleX(${p})`;
 }
 let ticking = false;
 addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(() => { ticking = false; render(); }); } }, { passive: true });
 frames.forEach(im => im.addEventListener('load', () => { current = -1; render(); }, { once: true }));
-render();
+try { render(); } catch (e) { console.error(e); }
 // The caption button moves the build forward one step
 $('caption').addEventListener('click', () => scrollBy({ top: innerHeight * 0.9, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' }));
 
@@ -83,3 +84,11 @@ const mb = document.querySelector('.menu-btn'), mnav = $('mnav');
 function closeMenu() { mnav.hidden = true; mb.setAttribute('aria-expanded', 'false'); }
 mb.addEventListener('click', () => { const open = mnav.hidden; mnav.hidden = !open; mb.setAttribute('aria-expanded', String(open)); });
 addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+
+/* ---------- section motion ---------- */
+document.querySelectorAll('[data-stagger] > li').forEach((li, i) => { li.classList.add('reveal'); li.style.setProperty('--i', i); });
+document.querySelectorAll('[data-stagger-lines] > div').forEach((d, i) => d.style.setProperty('--i', i));
+const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -12% 0px' });
+document.querySelectorAll('.reveal, .wipe, .mask-host, .points, .slide-in, .contact').forEach(el => io.observe(el));
+const head = document.querySelector('.site-head');
+addEventListener('scroll', () => head.classList.toggle('is-solid', scrollY > innerHeight * 0.5), { passive: true });
