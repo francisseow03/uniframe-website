@@ -56,13 +56,15 @@ img { display: block; max-width: 100%; height: auto; }
 .scroll-track { position: relative; height: 300vh; }
 .stage { position: sticky; top: 0; height: 100vh; height: 100svh; overflow: hidden; background: var(--stone); }
 canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; transform-origin: 0 0; will-change: transform; }
-.intro { position: absolute; z-index: 4; left: 50%; top: 50%; transform: translate(-50%, -50%); width: min(760px, calc(100% - 32px)); padding: 36px 40px 32px; text-align: center; }
-.intro p { margin: 14px auto 0; font-size: 19px; color: var(--text); max-width: 520px; }
+/* Start and end cards share one spot, so the title sits in the same place before and after the build */
+.intro, .final { position: absolute; left: max(16px, calc(50% - 620px)); top: max(100px, 12vh); width: min(620px, calc(100% - 32px)); padding: 32px; text-align: left; }
+.intro { z-index: 4; }
+.intro p { margin: 16px 0 0; font-size: 18px; color: var(--text); }
 .caption { position: absolute; left: 50%; bottom: 28px; transform: translateX(-50%); z-index: 6; display: grid; place-items: center; width: 52px; height: 52px; padding: 0; border: 0; border-radius: 50%; color: var(--deep); cursor: pointer;
   background: rgb(255 255 255 / .7); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: inset 0 0 0 1px rgb(255 255 255 / .8), 0 4px 16px rgb(35 58 52 / .08); white-space: nowrap; transition: opacity .3s; }
 .skip-hero { position: absolute; right: 24px; bottom: 34px; z-index: 6; font-size: 15px; font-weight: 500; text-underline-offset: 4px; }
-.final { position: absolute; left: max(16px, calc(50% - 620px)); top: max(100px, 12vh); width: min(500px, calc(100% - 32px)); padding: 32px; z-index: 6; opacity: 0; }
-.final p { margin: 16px 0 28px; font-size: 18px; color: var(--text-2); }
+.final { z-index: 6; opacity: 0; }
+.final p { margin: 16px 0 28px; font-size: 18px; color: var(--text); }
 
 /* Sections share one rhythm: 120 px top, 48 px under the title */
 .sec { padding: 120px 0; }
@@ -131,7 +133,7 @@ canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block
   .contact__panel { padding: 28px; } .grid2 { grid-template-columns: 1fr; } .card__a { opacity: 1; }
   .skip-hero { display: none; }
 }
-@media (max-width: 520px) { .final { padding: 24px; } .intro { padding: 24px 20px; } .intro p { font-size: 17px; }
+@media (max-width: 520px) { .final, .intro { padding: 24px; }
   .cards { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding-inline: 16px; gap: 16px; margin: 0 -16px; padding: 0 16px 8px; scrollbar-width: none; }
   .cards::-webkit-scrollbar { display: none; } .cards > li { flex: 0 0 78%; scroll-snap-align: start; } }
 
