@@ -38,7 +38,8 @@ function render() {
   if (r) {
     const W = innerWidth, H = innerHeight;
     const wx = r.x + WALL.x0 * r.w, ww = (WALL.x1 - WALL.x0) * r.w, wy = r.y + WALL.y0 * r.h, wh = (WALL.y1 - WALL.y0) * r.h;
-    const z = Math.max(1, Math.min(W / ww, (H - 120) / wh)), e = seg(f, 40, COUNT - 1);
+    // End frame: the wall fills the full width, so no empty stone shows at the sides
+    const z = Math.max(1, W / ww * 1.01), e = seg(f, 40, COUNT - 1);
     let tx = W / 2 - z * (wx + ww / 2), ty = (H + 40) / 2 - z * (wy + wh / 2);
     tx = Math.min(0, Math.max(W - z * W, tx)); ty = Math.min(0, Math.max(H - z * H, ty));
     canvas.style.transform = `translate(${lerp(0, tx, e)}px, ${lerp(0, ty, e)}px) scale(${lerp(1, z, e)})`;
